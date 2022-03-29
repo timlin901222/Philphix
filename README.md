@@ -1,3 +1,5 @@
-# fa21-proj1-starter
+##Overview
+A fast find-and-replace program that replaces strings in an input stream.
 
-Please add a description about what you created! Also add lessons you learned or bugs you encountered. 
+#Implementation
+The user can input is stored in a dictionary that is implemented by a hashmap. The program scans the input and accesses the dictionary to replace strings.
