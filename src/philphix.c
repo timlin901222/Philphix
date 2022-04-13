@@ -1,3 +1,4 @@
+
 /*
  * Include the provided hash table library.
  */
@@ -68,12 +69,145 @@ int main(int argc, char **argv) {
 /* Task 3 */
 void readDictionary(char *dictName) {
   // -- TODO --
-  fprintf(stderr, "You need to implement readDictionary\n");
-  
+  char * buffer = 0;
+  long length;
+  FILE * f;
+  if(!(f = fopen (dictName, "rb"))){
+      exit(61);
+  }
+  if (f){
+    fseek (f, 0, SEEK_END);
+    length = ftell (f);
+    fseek (f, 0, SEEK_SET);
+    buffer = malloc(length+1);
+    if (buffer){
+      fread (buffer, 1, length, f);
+    }
+    fclose (f);
+    buffer[length] = '\0';
+  }
+  while(buffer){
+    while(isspace((char) *buffer)) buffer++;
+    char * nextLine = strchr(buffer, '\n');
+    int strLineLen = nextLine ? (nextLine-buffer) : strlen(buffer);
+    char * tempStr = (char *) malloc(strLineLen+1);
+    if (tempStr){
+         memcpy(tempStr, buffer, strLineLen);
+         tempStr[strLineLen] = '\0';  // NUL-terminate!
+    }
+    writeInDict(tempStr);
+    buffer = nextLine ? (nextLine+1) : NULL;
+  }
+}
+
+void writeInDict(char *strLine) {
+    if(strlen(strLine) == 0) {
+      return;
+    }
+    char *rest = strpbrk(strLine, "\t ");
+    int strLineLen = rest ? (rest-strLine) : strlen(strLine);
+    char * tempStr = (char *) malloc(strLineLen+1);
+    if (tempStr){
+         memcpy(tempStr, strLine, strLineLen);
+         tempStr[strLineLen] = '\0';  
+    }
+    while(isspace((char) *rest)) rest++;
+    insertData(dictionary, tempStr, rest);
 }
 
 /* Task 4 */
 void processInput() {
   // -- TODO --
   fprintf(stderr, "You need to implement processInput\n");
+  char c;
+  char *tempStr;
+  int size;
+
+  
+  
+  fprintf(stderr, "runs here\n");
+  size = 0;
+ 
+  while ((c = fgetc(stdin)) != EOF) {
+      if (isalnum(c)) {
+        size = size + 1;
+        if (size == 1) tempStr = malloc(size+1);
+        else tempStr = realloc(tempStr, size+1);
+        tempStr[size-1] = c;
+        tempStr[size] = '\0';
+      }
+      else {
+        //output tempStr
+        if (tempStr != NULL) {
+          if (findData (dictionary, tempStr)){
+            fprintf(stdout, "%s", findData(dictionary, tempStr));
+          }
+          else {
+            char *copyStr = malloc(strlen(tempStr)+1);
+            memcpy(copyStr, tempStr, strlen(tempStr));
+            copyStr[strlen(tempStr)] = '\0';
+            int i;
+            for (i = 1; i < strlen(tempStr); i++){
+              copyStr[i] = tolower(copyStr[i]);
+            }
+            if (findData(dictionary, copyStr)) {
+              fprintf(stdout, "%s", findData(dictionary, copyStr));
+            }
+            else {
+              copyStr[0] = tolower(copyStr[0]);
+              if (findData(dictionary,copyStr)) {
+                fprintf(stdout, "%s", findData(dictionary, copyStr));
+              }
+              else{
+                fprintf(stdout, "%s", tempStr);
+              }
+            }
+            free(copyStr);
+          }
+        //clear tempStr
+        }
+        
+        free(tempStr);
+        tempStr = NULL;
+        size = 0;
+        // output character
+        fprintf(stdout , "%c", c);
+
+
+
+
+
+      }
+
+  }
+  if (tempStr != NULL) {
+    if (findData (dictionary, tempStr)){
+            fprintf(stdout, "%s", findData(dictionary, tempStr));
+          }
+          else {
+            char *copyStr = malloc(strlen(tempStr)+1);
+            memcpy(copyStr, tempStr, strlen(tempStr));
+            copyStr[strlen(tempStr)] = '\0';
+            int i;
+            for (i = 1; i < strlen(tempStr); i++){
+              copyStr[i] = tolower(copyStr[i]);
+            }
+            if (findData(dictionary, copyStr)) {
+              fprintf(stdout, "%s", findData(dictionary, copyStr));
+            }
+            else {
+              copyStr[0] = tolower(copyStr[0]);
+              if (findData(dictionary,copyStr)) {
+                fprintf(stdout, "%s", findData(dictionary, copyStr));
+              }
+              else{
+                fprintf(stdout, "%s", tempStr);
+              }
+            }
+            free(copyStr);
+          }
+        //clear tempStr
+        }
+  
+
 }
